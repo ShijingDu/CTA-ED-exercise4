@@ -1,6 +1,6 @@
 ---
 title: "CTA-ED Exercise 4: Scaling techniques"
-author: "[Your full name here]"
+author: "Shijing Du"
 date: "6/03/2024"
 output: html_document
 ---
@@ -173,3 +173,33 @@ dim(kaneko_dfm_study1)
 
 1. Estimate a wordfish model for the @kaneko_estimating_2021 data
 2. Visualize the results
+```{r}
+#estimate the Wordfish model
+set.seed(123L)
+kaneko_dfm_study1_results <- textmodel_wordfish(kaneko_dfm_study1, 
+                                             sparse = TRUE)
+summary(kaneko_dfm_study1_results)
+
+#plot theta
+textplot_scale1d(kaneko_dfm_study1_results)
+#Nikkei and Yomiuri newspapers tend to be right-wing, while Asahi and Chunichi tend to be left-wing.
+
+
+#Mapping "features", i.e. the word-level beta shows how words are positioned along this dimension
+textplot_scale1d(kaneko_dfm_study1_results, margin = "features")
+
+features <- kaneko_dfm_study1_results[["features"]]
+
+betas <- kaneko_dfm_study1_results[["beta"]]
+
+feat_betas <- as.data.frame(cbind(features, betas))
+feat_betas$betas <- as.numeric(feat_betas$betas)
+
+feat_betas %>%
+  arrange(desc(betas)) %>%
+  top_n(20) %>% 
+  kbl() %>%
+  kable_styling(bootstrap_options = "striped")
+#The clustered areas of the graph show a large number of words with no apparent political leaning, as beta is close to 0
+#The word "国際平和協力" has the highest positive beta (2.967629), suggesting that it is used more often in newspapers that favour a particular school of thought
+```
